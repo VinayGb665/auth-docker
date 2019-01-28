@@ -9,7 +9,14 @@ let userModel = models.userSchema
 app.listen(3000, (err) => {
     console.assert(!err,'Error')
 })
-app.get('/h', (req,res) => {
+app.get('/v1/users/:username', (req,res) => {
+    var username = req.params.username || '';
+    userModel.find({name:username}, (err,results) => {
+            if(!err) res.send(results)
+            else res.send(err) 
+    })
+
+    /*
     var x =process.env
     var dat = new userModel({"name":"a","pass":"sss"});
     dat.save((err) => {
@@ -27,8 +34,7 @@ app.get('/h', (req,res) => {
         }
         else res.send("GOne")
     });
-    /**/
-    //   res.send(x)
+    */
 })
 
 
