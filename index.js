@@ -8,6 +8,7 @@
 
 
 // Packages and dependancies -- >
+require('dotenv').config()
 var express =require('express')
 var app =express()
 var models = require('./models/models')
@@ -15,9 +16,9 @@ const uuidv4 = require('uuid/v4')
 const bodyparser = require('body-parser')
 const crypto = require('crypto');
 const saltRounds = process.env.SALT_ROUNDS || 10;
-const http_port = process.env.HTTP_PORT || 3000
+const http_port = process.env.HTTP_PORT ;
 let userModel = models.userSchema
-
+var services = require('./services/services');
 // Configs -- >
 
 app.use(bodyparser.json())
@@ -159,7 +160,17 @@ app.post('/v1/login' , (req,res) => {
 
 })
 
-app.listen(3000, (err) => {
+app.post('/v1/reset/:username', (req,res) => {
+    req.body.send_to = req.params.username;
+    
+    req.body.subject = "Reset password request"
+    services.reset_pass(req,res);
+    //res.send(process.env);
+
+})
+
+
+app.listen(http_port, (err) => {
     
     console.assert(!err,'Error');
 

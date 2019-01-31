@@ -31,7 +31,7 @@ userSchema.pre('save', function(next) {     // Middleware to hash passwords afte
 
     if(this.password) {                                                                                                                                                        
                                                                                                                                        
-        this.password  = crypto.pbkdf2Sync(this.password, this.salt,1000, 64, `sha512`).toString(`hex`);                                                                                                                
+        this.password  = crypto.pbkdf2Sync(this.password, this.salt,1000, 64, `sha512`).toString(`hex`);
     }                                                                                                                                                                          
     next()                                                                                                                                                                     
 }) 
