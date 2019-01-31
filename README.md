@@ -50,9 +50,7 @@ $ docker-compose up
 #### Building for source
 
 Ya I'll fill shit here let it be like this for now
-```sh
-$ gulp build dist --prod
-```
+
 
 
 ### Todos
