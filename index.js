@@ -1,3 +1,13 @@
+/**
+ * [...]
+ * Docker some shit man
+ * @author Hector
+ * @version 1.0 29/1/19 
+ * @since node-11
+ */
+
+
+// Packages and dependancies -- >
 var express =require('express')
 var app =express()
 var models = require('./models/models')
@@ -5,23 +15,18 @@ const uuidv4 = require('uuid/v4')
 const bodyparser = require('body-parser')
 const crypto = require('crypto');
 const saltRounds = process.env.SALT_ROUNDS || 10;
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({ extended: true }))
+const http_port = process.env.HTTP_PORT || 3000
 let userModel = models.userSchema
 
+// Configs -- >
 
+app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({ extended: true }))
 
-app.listen(3000, (err) => {
-    
-    console.assert(!err,'Error');
-
-})
-
-
+// Routes  -- >
 
 app.get('/v1/users/:username?', (req,res) => {
     /*
-    
         Get details of particular user or all users if none specified
 
     */
@@ -51,7 +56,7 @@ app.post('/v1/users/:username', (req,res) => {
 
         RESP ->
              - {'status':'Error'} with err message in case of any errors
-             - {'user':'name','status':'Success' } in case of successful signup 
+             - {'user':'name','status':'Success' ,'secretSalt':'xxx'} in case of successful signup 
                 - Generates a random 16 bit salt to generate and compare hashes later
     */
 
@@ -78,12 +83,13 @@ app.post('/v1/users/:username', (req,res) => {
                         Option to supply a custom salt of user preference and use a random if none supplied
 
                     */
-                        req.body.salt= crypto.randomBytes(16).toString('hex');  // Generate a 16 bit random salt used in the middleware for hashing
-
+                        req.body.salt = crypto.randomBytes(16).toString('hex');  // Generate a 16 bit random salt used in the middleware for hashing
+                        req.body.flago = false; // Flag used later for verification
                         var newUser = new userModel(req.body);
+
                         
                         newUser.save((err) => {                            
-                            if(!err) res.send({'user':uname,'status':'Successfully registered'}) 
+                            if(!err) res.send({'user':uname,'status':'Successfully registered','secretSalt':req.body.salt}) 
                             else res.send({'status':'Error.Please Try again','err':err});
                          });
               
@@ -145,7 +151,7 @@ app.post('/v1/login' , (req,res) => {
 
     }
     else{
-        
+
         res.send({'status' : 'Check your parameters'}) //Invalid request since some required fields were missing
     }
 
@@ -153,6 +159,11 @@ app.post('/v1/login' , (req,res) => {
 
 })
 
+app.listen(3000, (err) => {
+    
+    console.assert(!err,'Error');
+
+})
 
 
 
