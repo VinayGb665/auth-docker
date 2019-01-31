@@ -58,9 +58,4 @@ Ya I'll fill shit here let it be like this for now
  - Write MORE Tests
  - Add Night Mode
 
-License
-----
-
-MIT
-
 
