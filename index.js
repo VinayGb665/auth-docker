@@ -9,6 +9,7 @@
 
 // Packages and dependancies -- >
 require('dotenv').config()
+
 var express =require('express')
 var app =express()
 var models = require('./models/models')
@@ -19,12 +20,27 @@ const saltRounds = process.env.SALT_ROUNDS || 10;
 const http_port = process.env.HTTP_PORT ;
 let userModel = models.userSchema
 var services = require('./services/services');
+var request = require('request')
+const fs = require('fs')
+const path = require('path');
+const exec = require('child_process').exec;
+var csv = require("fast-csv");
 // Configs -- >
 
+app.set('view engine', 'ejs');
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
+app.use('/static', express.static(path.join(__dirname, 'public')))
 
 // Routes  -- >
+
+app.get('/editor',(req,res) =>{
+    //res.sendFile(__dirname+"/views/idk.html")
+    res.render('pages/index');
+})
+app.get('/choseq',(req,res) =>{
+    res.render('pages/questions');
+})
 
 app.get('/v1/users/:username?', (req,res) => {
     /*
@@ -47,6 +63,36 @@ app.get('/v1/users/:username?', (req,res) => {
     
 })
 
+app.get('/v1/reset/:username', (req,res) => {
+    req.body.send_to = req.params.username;
+    
+    req.body.subject = "Reset password request"
+    services.reset_pass(req,res);
+    //res.send(process.env);
+
+})
+
+app.get('/v1/reset/:username/:hash',(req,res) => {
+    
+    //res.send(req.params);
+   // services.verifyhash(req,res);
+})
+
+app.get('/v1/selectq',(req,res) =>{
+    
+ 
+    let results =[]
+    csv
+    .fromPath("resources/data.csv")
+    .on("data", function(data){
+         results.push(data)
+    })
+    .on("end", function(){
+
+         res.send(results);
+    })
+
+});
 
 app.post('/v1/users/:username', (req,res) => {
     /* 
@@ -160,12 +206,128 @@ app.post('/v1/login' , (req,res) => {
 
 })
 
-app.post('/v1/reset/:username', (req,res) => {
-    req.body.send_to = req.params.username;
+app.post('/v1/piler',(req,res) =>{
+    BASE_URL = "https://api.judge0.com/submissions?wait=true"
+
+    // CLIENT_SECRET ='48a4bf23783a007876faaa3b309000aafbda64ee'; 
+    // source ="console.log('Hello World!!');"
+
+    let source_code =req.body.source_code;
+    let language = req.body.lang;
     
-    req.body.subject = "Reset password request"
-    services.reset_pass(req,res);
-    //res.send(process.env);
+    var data ={
+        "source_code": source_code,
+        "language_id": language.id,
+        "number_of_runs": "1",
+        "stdin": "",  //Any input ---- NEED_REWORK_ON_HOW_TO_USE_THIS_FOR_THE_NEED ----
+        "expected_output": "hello, Judge0", // ---- PLAN_ON_HOW_TO_FEED/FETCH_THIS ----
+        "cpu_time_limit": "2",
+        "cpu_extra_time": "0.5",
+        "wall_time_limit": "5",
+        "memory_limit": "128000",
+        "stack_limit": "64000",
+        "max_processes_and_or_threads": "30",
+        "enable_per_process_and_thread_time_limit": false,
+        "enable_per_process_and_thread_memory_limit": true,
+        "max_file_size": "1024"
+    }
+
+
+    request({url:BASE_URL,method:'POST',proxy:'http://10.16.11.25:9090',body:data, json: true},(err,resp) => {
+       
+        //success =>{ "status":{"id":3,"description":"Accepted"}}   
+        console.log(resp.body)
+
+        if(err) res.send(err)
+
+        else {
+            let send_data =resp.body.status;
+            send_data['stdout']=resp.body.stdout;
+            send_data['stderr']=resp.body.stderr;
+            send_data=JSON.stringify(send_data)
+            res.send(send_data);
+        }
+    });
+
+})
+
+app.post('/v2/piler',(req,res) => {
+    /**
+     * v1 of the system uses third party api (https://api.judge0.com) with a GNU license and  is vulnerable to licensing issues
+     * v2 compiles code locally
+     * Issues to be addressed
+        - Safety of running the code directly (idea is to run this in a sandbox or a virtualenv so that effects remain contained )
+        - Writing into file with same name rn (idea is to change to a 5 length random alpha-numeric )
+        - Need to send more cleaner responses
+        - Versioning for the different compilers
+        - No idea on how this works under load so SCALING needed
+        - **** LOCAL SYSTEM RN iS A WINDOWS MACHINE - CODE NEEDS TO BE ADAPTIVE ****
+     * MORE LANGUAGES LOL
+
+     */
+
+    let source_code =req.body.source_code;
+    let language = req.body.lang;
+    console.log(req.body)
+    if(language['id']=='34'){ // handling python codes
+
+        fs.writeFile("prog.py",source_code,(err) => {
+            exec("python prog.py",(err,stdout,stderr) => {
+                console.log(stdout,stderr)
+                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
+                else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}))
+                fs.unlink("prog.py",(err) => {
+                    if(!err) console.log("deleted")
+                    else console.log("error while executing")
+                });
+            })
+        })
+
+    }
+    else  if(language['id']=='29'){ // handling js/nodejs codes
+        fs.writeFile("prog.js",source_code,(err) => {
+            exec("node prog.js",(err,stdout,stderr) => {
+                console.log(stdout,stderr)
+                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
+                else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}));
+                fs.unlink("prog.js",(err) => {
+                    if(!err) console.log("deleted")
+                    else console.log("error while executing")
+                });
+            })
+        })
+
+
+    }
+    else if(language['id']=='4'){
+        fs.writeFile("prog.c",source_code,(err) => {
+            exec("gcc prog.c -o prog_out.exe",(err,stdout,stderr) => {
+                console.log(stdout,stderr)
+                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
+                else {
+                    exec("prog_out.exe",(r_err,r_stdout,r_stderr)=>{
+                        if(r_err) res.send(JSON.stringify({"err":r_err,"stderr":r_stderr}))
+                        else res.send(JSON.stringify({"stdout":r_stdout,"stderr":r_stderr}))
+                    })
+                }
+                fs.unlink("prog.c",(err) => {
+                    if(!err) console.log("deleted")
+                    else console.log("error while executing")
+                });
+                fs.unlink("prog_out.exe",(err) => {
+                    if(!err) console.log("deleted")
+                    else console.log("error while executing")
+                });
+                
+            })
+        })
+
+    }
+    else{
+        res.send(JSON.stringify({"msg":"INTERNAL ERROR NO COMPILER FOUND"}))
+    }
+
+    //else if(language['id']){}
 
 })
 
@@ -175,8 +337,6 @@ app.listen(http_port, (err) => {
     console.assert(!err,'Error');
 
 })
-
-
 
 
 
