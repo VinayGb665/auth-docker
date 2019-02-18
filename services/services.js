@@ -1,6 +1,10 @@
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+var csv = require("fast-csv");
 var models = require('../models/models');
+const cache_code =require('../cache_code')
 let userModel = models.userSchema;
+let quizModel = models.quizSchema;
 var transporter = nodemailer.createTransport({
     host: process.env.smtp_host,
     port: process.env.smtp_port,
@@ -11,7 +15,7 @@ var transporter = nodemailer.createTransport({
            pass: process.env.mail_password
        }
    });
-
+var fs = require('fs')
 var services = {
     sendmail : (req,res,cb) =>{
         let mailOptions = {
@@ -61,6 +65,102 @@ var services = {
 
         })
     },
+    verifyhash: (req,res)=> {
+        if(req.params.username && req.params.hash){
+            userModel.findOne({username:req.params.username},(err,data) => {
+                if(!err && data){
+                    var actualHash = results.password.slice(0,15)+results.password.slice(0,6);
+                    if(actualHash == req.params.hash){
+                        /**
+                         * Unprogrammed PATH 
+                         */
+
+                
+                        pass;
+
+                    }
+                    else{
+                        /**
+                         * Unprogrammed PATH 
+                         */
+                    }
+                }
+            })
+        }
+        else{
+            res.send()
+        }
+    },
+    gettopics: (req,res) =>{
+        fs.readdir('resources/',(err,data) =>{
+            console.log(err,data)
+            if(err) res.send(err)
+            else res.send(data)
+        })
+
+    },
+    getcachecode : (req,res) => {
+        let language = req.params.language;
+        console.log(decodeURIComponent(language))
+        if(cache_code.hasOwnProperty(language)){
+
+            res.send(cache_code[language]);
+        }
+        else{
+            console.log("nope")
+            res.send("");
+        }
+    },
+    createquizlink : (req,res) => {
+        let qarr = req.body.questions;
+        let hash = crypto.randomBytes(5).toString('hex');
+        var newq = new quizModel({link:hash,questions:qarr})
+        newq.save((err) =>{
+            console.log(err);
+            if(!err) res.send({"link":process.env.HTTP_HOST+":"+process.env.HTTP_PORT+"/v1/quiz/"+hash})
+            else res.send("nope FO")
+        })
+    },
+    renderquiz : (req,res) =>{
+        let hash = req.params.hash;
+        quizModel.findOne({link:hash},{_id:0,questions:1},(err,results) =>{
+            console.log(err,results)
+            if(!err && results){
+                results=JSON.parse(JSON.stringify(results))
+                let qarr=[]
+                
+                let topic = results.questions.pop()['topic']
+                let qids=  results.questions.map(Number)
+                
+                csv
+                .fromPath("resources/"+topic)
+                .on("data", function(data){
+                    for(i=0;i<qids.length;i++){
+                        //console.log(qids[i])
+                        if(qids[i]==data[0]){
+                            //console.log('uh huh',i)
+                            qarr.push(data)
+                        }
+
+                    }
+                })
+                .on("end", function(){
+                     console.log(qarr)
+                     res.send(qarr)
+                })
+                
+            }
+            else{
+                if(!results){
+                    res.send("OK SMD NO QUIZ FOR U")
+                }
+                else{
+                    res.send(err)
+                }
+            }
+        })
+    }
+
     
 
 }

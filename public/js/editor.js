@@ -5,16 +5,24 @@ const piler_langs_url = "https://api.judge0.com/languages";
 
 function showErr(msg,type,version){
     if(version==1){
+        let html_str='';
         if(type==1){
-            $("#alert").html(`</br><div class="alert alert-warning" role="alert">
+            html_str=`</br><div class="alert alert-warning" role="alert">
             <strong>STDERR:&nbsp;&nbsp;&nbsp;</strong>`+msg['stderr']+`</div><div class="alert alert-success" role="alert">Accepted
-        </div>'`)
+        </div>`
+        console.log(msg)
         }
         else{
-            $("#alert").html(`</br><div class="alert alert-danger" role="alert">`+msg['description']+`
+            html_str=`</br><div class="alert alert-danger" role="alert">`+msg['description']+`
         </div><div class="alert alert-warning" role="alert">
-        <strong>STDERR:&nbsp;&nbsp;&nbsp;</strong>`+msg['stderr']+`</div>`)
+        <strong>STDERR:&nbsp;&nbsp;&nbsp;</strong>`+msg['stderr']+`</div>`
         }
+        html_str+=`<div class="alert alert-success" role="alert"><strong>STDOUT : &nbsp;&nbsp;&nbsp;</strong>`+msg['stdout']
+        html_str+=`<div ><details><summary>More details</summary><p>TIME : &nbsp;`+msg['time']+`</p><p>MEMORY : &nbsp;`+msg['memory']+`</p></details></div></div>`
+
+        $("#alert").html(html_str)
+
+        
     }
     else{
         let err_msg =msg['stderr']
@@ -30,6 +38,31 @@ function showErr(msg,type,version){
     }   
 }
 
+function fill_cache_code(){
+    let lang = $('#drops option:selected')
+    $("#textarea").val("");
+    $("#textarea").prop('disabled', true);
+    let fi = lang[0].innerHTML.indexOf('(')
+    lang = encodeURIComponent(lang[0].innerHTML.slice(0,fi-1));
+    
+    if(lang.substr(-1)=="#"){
+        console.log("asda")
+        lang="C%23"
+    }
+    
+    $.get("/v1/cache_code/"+lang,(data) => {
+        console.log('got back');
+        $("#textarea").prop('disabled', false);
+        $("#textarea").val(data);
+        
+    })
+    
+}
+
+function splitValue(value, index) {
+    return value.substring(0, index) + "\t  " + value.substring(index);
+}
+
 
 $(document).ready(function(){
 
@@ -43,8 +76,16 @@ $(document).ready(function(){
             });
             html_str+='</select>'
             $("#selector").html(html_str);
+
+            fill_cache_code()
+            
         } 
         else options =[]
+    }).then(() => {
+        $("#drops").on('change',(e) => {
+            fill_cache_code()
+        })
+
     })
 
 
@@ -73,7 +114,7 @@ $(document).ready(function(){
             let respo =(JSON.parse(resp))
             if(respo.hasOwnProperty('description')){
                 if(respo['description']=="Accepted"){
-                    showErr("a",1,1); // No compilation or runtime errors and 
+                    showErr(respo,1,1); // No compilation or runtime errors and 
                 }
                 else{
                     showErr(respo,2,1)
@@ -89,4 +130,15 @@ $(document).ready(function(){
         
          })
      })
+
+     $("#textarea").on('keydown', (e) => {
+         if(e.keyCode == 9){
+             e.preventDefault();
+  
+             document.execCommand('insertText', false, ' '.repeat(4)); //--Adds tabspace not sure how-- checkout this here -> https://stackoverflow.com/a/52918135/6666596
+         }
+     })
+
+
+    
 })

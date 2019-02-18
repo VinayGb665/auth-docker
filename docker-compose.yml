@@ -6,7 +6,7 @@ services:
     restart: on-failure:2
     build: .
     ports:
-      - "3000:3000"
+      - "6566:6566"
     links:
       - mongo
 

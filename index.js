@@ -38,8 +38,9 @@ app.get('/editor',(req,res) =>{
     //res.sendFile(__dirname+"/views/idk.html")
     res.render('pages/index');
 })
+
 app.get('/choseq',(req,res) =>{
-    res.render('pages/questions');
+    res.render('pages/qpage');
 })
 
 app.get('/v1/users/:username?', (req,res) => {
@@ -78,21 +79,33 @@ app.get('/v1/reset/:username/:hash',(req,res) => {
    // services.verifyhash(req,res);
 })
 
-app.get('/v1/selectq',(req,res) =>{
+app.get('/v1/selectq/:subname',(req,res) =>{
     
- 
+    let subname = req.params.subname
+    
     let results =[]
     csv
-    .fromPath("resources/data.csv")
+    .fromPath("resources/"+subname)
     .on("data", function(data){
          results.push(data)
     })
     .on("end", function(){
-
          res.send(results);
     })
 
 });
+
+app.get('/v1/gettopics',(req,res) =>{
+    services.gettopics(req,res);
+})
+
+app.get('/v1/quiz/:hash',(req,res) =>{
+    services.renderquiz(req,res);
+})
+
+app.post('/v1/quiz',(req,res) => {
+    services.createquizlink(req,res);
+})
 
 app.post('/v1/users/:username', (req,res) => {
     /* 
@@ -244,6 +257,8 @@ app.post('/v1/piler',(req,res) =>{
             let send_data =resp.body.status;
             send_data['stdout']=resp.body.stdout;
             send_data['stderr']=resp.body.stderr;
+            send_data['time']=resp.body.time;
+            send_data['memory']=resp.body.memory;
             send_data=JSON.stringify(send_data)
             res.send(send_data);
         }
@@ -331,7 +346,10 @@ app.post('/v2/piler',(req,res) => {
 
 })
 
+app.get('/v1/cache_code/:language',(req,res) => {
+    services.getcachecode(req,res);
 
+})
 app.listen(http_port, (err) => {
     
     console.assert(!err,'Error');

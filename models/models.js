@@ -13,16 +13,19 @@ const crypto = require('crypto');
 
 */ 
 const mongo_port = process.env.MONGO_PORT || 27017; // Configurable mongodB port
+const mongo_host = process.env.MONGO_HOST || 'localhost'
 const coll_name = process.env.COL_NAME || 'users'; // Configurable collection name 
-
+let con_url ='mongodb://'+mongo_host+':'+mongo_port+'/'+coll_name;
 // Connection -->
-
-var conn = mongoose.connect('mongodb://mongo:'+mongo_port+'/'+coll_name,{ useNewUrlParser: true })
+console.log(con_url)
+var conn = mongoose.connect(con_url,{ useNewUrlParser: true })
 console.assert(conn,"Error connecting to the DB");
 
 // Schemas -->
 
 let userSchema = new mongoose.Schema({},{strict:false}); 
+
+let quizSchema = new mongoose.Schema({},{strict:false})
 
 // Middleware for Schemas -->
 
@@ -38,3 +41,4 @@ userSchema.pre('save', function(next) {     // Middleware to hash passwords afte
 
 //exports
 module.exports.userSchema = mongoose.model("userModel",userSchema)
+module.exports.quizSchema = mongoose.model("quizModel",quizSchema)
