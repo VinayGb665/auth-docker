@@ -15,7 +15,7 @@ const crypto = require('crypto');
 const mongo_port = process.env.MONGO_PORT || 27017; // Configurable mongodB port
 const mongo_host = process.env.MONGO_HOST || 'localhost'
 const coll_name = process.env.COL_NAME || 'users'; // Configurable collection name 
-let con_url ='mongodb://'+mongo_host+':'+mongo_port+'/'+coll_name || procee.env.MONGODB_URI;
+let con_url ='mongodb://'+mongo_host+':'+mongo_port+'/'+coll_name || process.env.MONGODB_URI;
 // Connection -->
 console.log(con_url)
 var conn = mongoose.connect(con_url,{ useNewUrlParser: true })
