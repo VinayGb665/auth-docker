@@ -1,1 +1,1 @@
-web: node index.js --no-deprecation
+web: npm start 
