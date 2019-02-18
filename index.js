@@ -20,6 +20,7 @@ const saltRounds = process.env.SALT_ROUNDS || 10;
 const http_port = process.env.HTTP_PORT ;
 let userModel = models.userSchema
 var services = require('./services/services');
+var auth_services = require('./services/auth_services');
 var request = require('request')
 const fs = require('fs')
 const path = require('path');
@@ -68,7 +69,7 @@ app.get('/v1/reset/:username', (req,res) => {
     req.body.send_to = req.params.username;
     
     req.body.subject = "Reset password request"
-    services.reset_pass(req,res);
+    auth_services.reset_pass(req,res);
     //res.send(process.env);
 
 })
@@ -79,10 +80,9 @@ app.get('/v1/reset/:username/:hash',(req,res) => {
    // services.verifyhash(req,res);
 })
 
-app.get('/v1/selectq/:subname',(req,res) =>{
+app.get('/v1/selectq/:subname/',(req,res) =>{
     
     let subname = req.params.subname
-    
     let results =[]
     csv
     .fromPath("resources/"+subname)
@@ -100,10 +100,14 @@ app.get('/v1/gettopics',(req,res) =>{
 })
 
 app.get('/v1/quiz/:hash',(req,res) =>{
+    res.render('pages/quiz');
+})
+
+app.post('/v1/quiz/:hash',(req,res) =>{
     services.renderquiz(req,res);
 })
 
-app.post('/v1/quiz',(req,res) => {
+app.post('/v1/createquiz',(req,res) => {
     services.createquizlink(req,res);
 })
 
@@ -267,83 +271,7 @@ app.post('/v1/piler',(req,res) =>{
 })
 
 app.post('/v2/piler',(req,res) => {
-    /**
-     * v1 of the system uses third party api (https://api.judge0.com) with a GNU license and  is vulnerable to licensing issues
-     * v2 compiles code locally
-     * Issues to be addressed
-        - Safety of running the code directly (idea is to run this in a sandbox or a virtualenv so that effects remain contained )
-        - Writing into file with same name rn (idea is to change to a 5 length random alpha-numeric )
-        - Need to send more cleaner responses
-        - Versioning for the different compilers
-        - No idea on how this works under load so SCALING needed
-        - **** LOCAL SYSTEM RN iS A WINDOWS MACHINE - CODE NEEDS TO BE ADAPTIVE ****
-     * MORE LANGUAGES LOL
-
-     */
-
-    let source_code =req.body.source_code;
-    let language = req.body.lang;
-    console.log(req.body)
-    if(language['id']=='34'){ // handling python codes
-
-        fs.writeFile("prog.py",source_code,(err) => {
-            exec("python prog.py",(err,stdout,stderr) => {
-                console.log(stdout,stderr)
-                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
-                else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}))
-                fs.unlink("prog.py",(err) => {
-                    if(!err) console.log("deleted")
-                    else console.log("error while executing")
-                });
-            })
-        })
-
-    }
-    else  if(language['id']=='29'){ // handling js/nodejs codes
-        fs.writeFile("prog.js",source_code,(err) => {
-            exec("node prog.js",(err,stdout,stderr) => {
-                console.log(stdout,stderr)
-                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
-                else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}));
-                fs.unlink("prog.js",(err) => {
-                    if(!err) console.log("deleted")
-                    else console.log("error while executing")
-                });
-            })
-        })
-
-
-    }
-    else if(language['id']=='4'){
-        fs.writeFile("prog.c",source_code,(err) => {
-            exec("gcc prog.c -o prog_out.exe",(err,stdout,stderr) => {
-                console.log(stdout,stderr)
-                if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
-                else {
-                    exec("prog_out.exe",(r_err,r_stdout,r_stderr)=>{
-                        if(r_err) res.send(JSON.stringify({"err":r_err,"stderr":r_stderr}))
-                        else res.send(JSON.stringify({"stdout":r_stdout,"stderr":r_stderr}))
-                    })
-                }
-                fs.unlink("prog.c",(err) => {
-                    if(!err) console.log("deleted")
-                    else console.log("error while executing")
-                });
-                fs.unlink("prog_out.exe",(err) => {
-                    if(!err) console.log("deleted")
-                    else console.log("error while executing")
-                });
-                
-            })
-        })
-
-    }
-    else{
-        res.send(JSON.stringify({"msg":"INTERNAL ERROR NO COMPILER FOUND"}))
-    }
-
-    //else if(language['id']){}
-
+    services.v2compiler(req,res);
 })
 
 app.get('/v1/cache_code/:language',(req,res) => {

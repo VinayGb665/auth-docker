@@ -74,7 +74,7 @@ $(document).ready(function(){
       
         questions.push({"topic":$('#drops option:selected').val()})
         console.log(questions)
-        $.post("/v1/quiz",{'questions':questions},(data) => {
+        $.post("/v1/createquiz",{'questions':questions},(data) => {
             console.log(data)
             
             

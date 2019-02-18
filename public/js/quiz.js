@@ -1,19 +1,16 @@
 function build_question_html(question){
-    let str=''
+    let html_str=''
    
     if(question[2]==1){
-        str+=`
-        <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input"  id="`+question[1]+`" type="checkbox" value="`+question[0]+`" id="defaultCheck1">
-         <label class="custom-control-label"  style="position:relative;left:102%;top:-15%" for="`+question[1]+`"></label>
-        </div>
+        html_str+=`
+        <div class="mySlides">  
         <div class="card" >
         <div class="card-header">
                 `+question[1]+`
         </div><div class="card-body">
         `;
         question[3].split(";").forEach((option)=>{
-            str+=`
+            html_str+=`
             
             <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -27,6 +24,52 @@ function build_question_html(question){
           `
         })
     }
-    return str+'</div></div></br>';
+    return html_str+'</div></div></div></br>';
     
 }
+
+
+var slideIndex = 1;
+
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  console.log(slides.length)
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+  }
+  // for (i = 0; i < dots.length; i++) {
+  //     dots[i].className = dots[i].className.replace(" active", "");
+  // }
+  slides[slideIndex-1].style.display = "block";  
+  //dots[slideIndex-1].className += " active";
+}
+
+$(document).ready(function(){
+  var hash = window.location.pathname.split('/')[3];
+  //console.log()
+  $.post('/v1/quiz/'+hash,(data) => {
+    console.log(data);
+    var html_str = '';
+    var span_str = '';
+    for(i=0;i<data.length;i++){
+      html_str +=build_question_html(data[i])
+      span_str +=`<span class="dot" onclick="currentSlide(`+i+`)"></span>`;
+    }
+    $("#qbox").html(html_str);
+    showSlides(slideIndex);
+  })
+
+})
