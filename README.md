@@ -1,5 +1,5 @@
 # Auth-dock
-[![Build Status]https://travis-ci.org/VinayGb665/auth-docker.svg?branch=master)](https://travis-ci.org/VinayGb665/)
+[![Build Status](https://travis-ci.org/VinayGb665/auth-docker.svg?branch=master)](https://travis-ci.org/VinayGb665/)
 
 # Auth-docker is a docker based experiment for modularizing basic auth such as login , register etc.
 
