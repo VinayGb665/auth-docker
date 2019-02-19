@@ -17,7 +17,7 @@ const uuidv4 = require('uuid/v4')
 const bodyparser = require('body-parser')
 const crypto = require('crypto');
 const saltRounds = process.env.SALT_ROUNDS || 10;
-const http_port = process.env.PORT ;
+const http_port = process.env.PORT || process.env.HTTP_PORT ;
 let userModel = models.userSchema
 var services = require('./services/services');
 var auth_services = require('./services/auth_services');
@@ -250,7 +250,7 @@ app.post('/v1/piler',(req,res) =>{
     }
 
 
-    request({url:BASE_URL,method:'POST',proxy:'http://10.16.11.25:9090',body:data, json: true},(err,resp) => {
+    request({url:BASE_URL,method:'POST',body:data, json: true},(err,resp) => {
        
         //success =>{ "status":{"id":3,"description":"Accepted"}}   
         console.log(resp.body)
@@ -279,7 +279,7 @@ app.get('/v1/cache_code/:language',(req,res) => {
 
 })
 app.listen(http_port, (err) => {
-    
+   
     console.assert(!err,'Error');
 
 })
