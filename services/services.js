@@ -124,7 +124,7 @@ var services = {
         var newq = new quizModel({link:hash,questions:qarr})
         newq.save((err) =>{
             console.log(err);
-            if(!err) res.send({"link":process.env.HTTP_HOST+":"+process.env.HTTP_PORT+"/v1/quiz/"+hash})
+            if(!err) res.send({"link":process.env.HOST_URI+"/v1/quiz/"+hash})
             else res.send("nope FO")
         })
     },
