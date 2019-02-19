@@ -44,8 +44,22 @@ $(document).ready(function(){
                 
               `
             })
+            str+='</div></div></br>'
         }
-        return str+'</div></div></br>';
+        else if(question[2]==2){
+          
+            str=`
+            <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input"  id="`+question[1]+`" type="checkbox" value="`+question[0]+`" id="defaultCheck1">
+            <label class="custom-control-label"  style="position:relative;left:102%;top:-15%" for="`+question[1]+`"></label>
+           </div>
+            <div class="card">
+  <div class="card-body">`+question[1]+`
+    
+  </div>
+</div></br>`;
+        }
+        return str;
         
     }
     

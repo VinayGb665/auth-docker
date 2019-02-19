@@ -3,6 +3,7 @@ function build_question_html(question){
    
     if(question[2]==1){
         html_str+=`
+      
         <div class="mySlides">  
         <div class="card" >
         <div class="card-header">
@@ -23,8 +24,21 @@ function build_question_html(question){
             
           `
         })
+        html_str+='</div></div></div></br>'
     }
-    return html_str+'</div></div></div></br>';
+    else{
+
+      html_str=`
+      <div class="mySlides" type="2">  
+      
+      <div class="card">
+<div class="card-body">`+question[1]+`
+
+</div>
+</div></div></br>`;
+    }
+    
+    return html_str;
     
 }
 
@@ -43,6 +57,7 @@ function currentSlide(n) {
 function showSlides(n) {
   var i;
   var slides = document.getElementsByClassName("mySlides");
+  
   console.log(slides.length)
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) {slideIndex = 1}    
@@ -53,12 +68,20 @@ function showSlides(n) {
   // for (i = 0; i < dots.length; i++) {
   //     dots[i].className = dots[i].className.replace(" active", "");
   // }
+  console.log(slides[slideIndex-1].getAttribute('type'))
+  if(slides[slideIndex-1].getAttribute('type')==2){
+    $("#editor").css('display','block');
+  }
+  else{
+    $("#editor").css('display','none');
+  }
   slides[slideIndex-1].style.display = "block";  
   //dots[slideIndex-1].className += " active";
 }
 
 $(document).ready(function(){
   var hash = window.location.pathname.split('/')[3];
+  $("#editor").css('display','none');
   //console.log()
   $.post('/v1/quiz/'+hash,(data) => {
     console.log(data);

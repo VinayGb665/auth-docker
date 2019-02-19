@@ -236,8 +236,7 @@ app.post('/v1/piler',(req,res) =>{
         "source_code": source_code,
         "language_id": language.id,
         "number_of_runs": "1",
-        "stdin": "",  //Any input ---- NEED_REWORK_ON_HOW_TO_USE_THIS_FOR_THE_NEED ----
-        "expected_output": "hello, Judge0", // ---- PLAN_ON_HOW_TO_FEED/FETCH_THIS ----
+        "stdin": "",  //Any input ---- NEED_REWORK_ON_HOW_TO_USE_THIS_FOR_THE_NEED ---- // ---- PLAN_ON_HOW_TO_FEED/FETCH_THIS ----
         "cpu_time_limit": "2",
         "cpu_extra_time": "0.5",
         "wall_time_limit": "5",
@@ -279,7 +278,7 @@ app.get('/v1/cache_code/:language',(req,res) => {
 
 })
 app.listen(http_port, (err) => {
-   
+    console.log(http_port)
     console.assert(!err,'Error');
 
 })

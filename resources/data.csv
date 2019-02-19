@@ -2,6 +2,6 @@ ID,QUESTION,TYPE_ID,OPTIONS
 1,what is A,1,a;b;c;d
 2,where is A,1,a;b;c;d
 3,how is A,1,a;b;c;d
-4,Why is A,1,a;b;c;d
+4,Why is A,2,a;b;c;d
 5,When is A,1,a;b;c;d
-6,which is A,1,a;b;c;d
+6,which is A,2
