@@ -34,10 +34,15 @@ app.use(bodyparser.urlencoded({ extended: true }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 
 // Routes  -- >
+app.get('/',(req,res) =>{
+    //res.sendFile(__dirname+"/views/idk.html")
+    res.render('pages/index');
+})
+
 
 app.get('/editor',(req,res) =>{
     //res.sendFile(__dirname+"/views/idk.html")
-    res.render('pages/index');
+    res.render('pages/piler');
 })
 
 app.get('/choseq',(req,res) =>{
