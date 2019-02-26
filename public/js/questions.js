@@ -1,5 +1,6 @@
 $(document).ready(function(){
-   
+    var timeSelected = false;
+    
     $.get('/v1/gettopics',(data)=>{
         if(data){
             console.log(data)
@@ -81,14 +82,15 @@ $(document).ready(function(){
     function build_quiz(){
         let arri=$(".custom-control-input:checked")
         let questions=[]
-        
+        let hours = $("#hours").val()
+        let mins = $("#mins").val()
         for(let i=0;i<arri.length;i++){
             questions.push(arri[i].value)
         }
       
         questions.push({"topic":$('#drops option:selected').val()})
-        console.log(questions)
-        $.post("/v1/createquiz",{'questions':questions},(data) => {
+        console.log(questions,hours,mins)
+        $.post("/v1/createquiz",{'questions':questions,'hours':hours,'mins':mins},(data) => {
             console.log(data)
             
             
@@ -98,12 +100,22 @@ $(document).ready(function(){
             
         })
     }
+    
+    function select_time(){
+        $("#qbox").css('display','none');
+        $("#topics").css('display','none');
+        timeSelected=true;
+    }
 
     $("#topics").on('change',(e) =>{
         getquestions();
     })
 
     $("#maketest").on('click',(e) => {
-        build_quiz()
+        if(timeSelected) build_quiz()
+        else{
+            select_time();
+        }
+
     })
 })

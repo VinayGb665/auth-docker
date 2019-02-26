@@ -16,10 +16,10 @@ function build_question_html(question){
             <div class="input-group mb-3">
             <div class="input-group-prepend">
               <div class="input-group-text">
-                <input type="radio" name="`+question[0]+`" aria-label="Checkbox for following text input">
+                <input type="radio" name="`+question[0]+`" aria-label="Checkbox for following text input" >
               </div>
             </div>
-            <input type="text" class="form-control" aria-label="Text input with checkbox" value="`+option+`">
+            <input type="text" class="form-control" readonly aria-label="Text input with checkbox" value="`+option+`">
             </div>
             
           `
@@ -31,7 +31,7 @@ function build_question_html(question){
       html_str=`
       <div class="mySlides" type="2">  
       
-      <div class="card">
+      <div class="card border-dark mb-3" >
 <div class="card-body">`+question[1]+`
 
 </div>
@@ -44,7 +44,8 @@ function build_question_html(question){
 
 
 var slideIndex = 1;
-
+var hours = 1;
+var mins = 0;
 
 function plusSlides(n) {
   showSlides(slideIndex += n);
@@ -68,7 +69,7 @@ function showSlides(n) {
   // for (i = 0; i < dots.length; i++) {
   //     dots[i].className = dots[i].className.replace(" active", "");
   // }
-  console.log(slides[slideIndex-1].getAttribute('type'))
+  
   if(slides[slideIndex-1].getAttribute('type')==2){
     $("#editor").css('display','block');
   }
@@ -85,12 +86,27 @@ $(document).ready(function(){
   //console.log()
   $.post('/v1/quiz/'+hash,(data) => {
     console.log(data);
+    hours = data.hours;
+    mins = data.mins;
+    data = data.qarr;
     var html_str = '';
     var span_str = '';
     for(i=0;i<data.length;i++){
       html_str +=build_question_html(data[i])
       span_str +=`<span class="dot" onclick="currentSlide(`+i+`)"></span>`;
     }
+    var date = new Date();
+        
+    date.setHours(date.getHours()+Number(hours))
+    date.setMinutes(date.getMinutes()+Number(mins))
+
+    $('#timer').countdown(date, function(event) {
+      $(this).html(event.strftime('%H:%M:%S'));
+    })
+    .on('stop.countdown', function() {
+      // render something
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    })
     $("#qbox").html(html_str);
     showSlides(slideIndex);
   })

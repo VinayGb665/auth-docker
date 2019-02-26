@@ -119,9 +119,10 @@ var services = {
         }
     },
     createquizlink : (req,res) => {
+        console.log(req.body)
         let qarr = req.body.questions;
         let hash = crypto.randomBytes(5).toString('hex');
-        var newq = new quizModel({link:hash,questions:qarr})
+        var newq = new quizModel({link:hash,questions:qarr,hours:req.body.hours,mins:req.body.mins})
         newq.save((err) =>{
             console.log(err);
             if(!err) res.send({"link":process.env.HOST_URI+"/v1/quiz/"+hash})
@@ -130,7 +131,8 @@ var services = {
     },
     renderquiz : (req,res) =>{
         let hash = req.params.hash;
-        quizModel.findOne({link:hash},{_id:0,questions:1},(err,results) =>{
+        console.log(hash)
+        quizModel.findOne({link:hash},{_id:0},(err,results) =>{
 
             console.log(err,results)
 
@@ -155,7 +157,7 @@ var services = {
                 })
                 .on("end", function(){
                      console.log(qarr)
-                     res.send(qarr)
+                     res.send({qarr:qarr,hours:results.hours,mins:results.mins})
                 })
                 
             }
