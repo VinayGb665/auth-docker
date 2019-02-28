@@ -2,7 +2,8 @@
 
 var piler_url ="/v1/piler"
 const piler_langs_url = "https://api.judge0.com/languages";
-
+var respo;
+var source_codes=[];
 function showErr(msg,type,version){
     if(version==1){
         let html_str='';
@@ -13,6 +14,7 @@ function showErr(msg,type,version){
         console.log(msg)
         }
         else{
+            
             html_str=`</br><div class="alert alert-danger" role="alert">`+msg['description']+`
         </div><div class="alert alert-warning" role="alert">
         <strong>STDERR:&nbsp;&nbsp;&nbsp;</strong>`+msg['stderr']+`</div>`
@@ -98,6 +100,7 @@ $(document).ready(function(){
              "source_code":$("#textarea").val(),
              "lang":{"id":$('#drops option:selected').val()}
          }
+         source_codes.push($("#textarea").val())
          let version=$('#version option:selected').val()
          console.log("version",version)
          if(version==2){
@@ -111,7 +114,7 @@ $(document).ready(function(){
          $.post(piler_url,data,(resp) =>{
              
             console.log(resp)
-            let respo =(JSON.parse(resp))
+             respo =(JSON.parse(resp))
             if(respo.hasOwnProperty('description')){
                 if(respo['description']=="Accepted"){
                     showErr(respo,1,1); // No compilation or runtime errors and 

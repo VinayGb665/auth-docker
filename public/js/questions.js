@@ -104,6 +104,7 @@ $(document).ready(function(){
     function select_time(){
         $("#qbox").css('display','none');
         $("#topics").css('display','none');
+        $("#timeselector").css('display','block');
         timeSelected=true;
     }
 

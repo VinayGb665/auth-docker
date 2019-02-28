@@ -7,6 +7,7 @@ var fs = require('fs')
 const exec = require('child_process').exec;
 let userModel = models.userSchema;
 let quizModel = models.quizSchema;
+let quizzeeModel = models.quizeeSchema;
 
 var transporter = nodemailer.createTransport({
     host: process.env.smtp_host,
@@ -249,6 +250,19 @@ var services = {
 
         //else if(language['id']){}
 
+    },
+    getquizzee: (req,res) => {
+        let quizzee = new quizzeeModel(req.body);
+        quizzee.save((err)=>{
+            if(!err){
+                console.log("\r\nNew candidate for quiz ")
+                res.send(quizzee);
+            }
+            else{
+                console.log("\r\nError saving new quiz candidate",err)
+                res.send(err);
+            }
+        })
     }
 
     

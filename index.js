@@ -1,6 +1,6 @@
 /**
  * [...]
- * Docker some shit man
+ * Docker some shit man went into something else
  * @author Hector
  * @version 1.0 29/1/19 
  * @since node-11
@@ -267,6 +267,7 @@ app.post('/v1/piler',(req,res) =>{
             send_data['stderr']=resp.body.stderr;
             send_data['time']=resp.body.time;
             send_data['memory']=resp.body.memory;
+            send_data['token']=resp.body.token;
             send_data=JSON.stringify(send_data)
             res.send(send_data);
         }
@@ -281,6 +282,11 @@ app.post('/v2/piler',(req,res) => {
 app.get('/v1/cache_code/:language',(req,res) => {
     services.getcachecode(req,res);
 
+})
+
+
+app.post('/v1/quizzee', (req,res) =>{
+    services.getquizzee(req,res);
 })
 app.listen(http_port, (err) => {
     console.log(http_port)

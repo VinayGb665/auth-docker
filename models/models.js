@@ -27,6 +27,9 @@ let userSchema = new mongoose.Schema({},{strict:false});
 
 let quizSchema = new mongoose.Schema({},{strict:false})
 
+let quizeeSchema = new mongoose.Schema({},{strict:false})
+
+
 // Middleware for Schemas -->
 
 
@@ -42,3 +45,4 @@ userSchema.pre('save', function(next) {     // Middleware to hash passwords afte
 //exports
 module.exports.userSchema = mongoose.model("userModel",userSchema)
 module.exports.quizSchema = mongoose.model("quizModel",quizSchema)
+module.exports.quizeeSchema = mongoose.model("quizeeModel",quizeeSchema)
