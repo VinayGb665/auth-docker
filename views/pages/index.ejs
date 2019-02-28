@@ -1,31 +1,148 @@
 <!DOCTYPE html>
 <html>
 <title>W3.CSS Template</title>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script  src="https://code.jquery.com/jquery-3.3.1.min.js"  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+ 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-<style>
-body,h1 {font-family: "Raleway", sans-serif}
-body, html {height: 100%}
-.bgimg {
-  background-image: url('https://www.w3schools.com/w3images/forestbridge.jpg');
-  min-height: 100%;
-  background-position: center;
-  background-size: cover;
-}
-</style>
-<body>
 
-<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+
+
+</head>
+<body style="">
+  <!-- views/partials/header.ejs -->
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/editor">Editor</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
   
-  <div class="w3-display-middle">
-    <h1 class="w3-jumbo w3-animate-top">COMING SOON</h1>
-    <hr class="w3-border-grey" style="margin:auto;width:40%">
-    <p class="w3-large w3-center">35 days left</p>
-  </div>
-  \
-</div>
-
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item ">
+          <a class="nav-link" href="/choseq">Chose questions<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item ">
+          <a class="nav-link" href="#">Quiz<span class="sr-only">(current)</span></a>
+        </li>
+        
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+        
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+          <ul class="navbar-nav mr-auto">
+              <i class="fa fa-user" aria-hidden="true"></i>
+              <li class="nav-item ">
+                  <a id="username" class="nav-link" href="#">Guest<span class="sr-only">(current)</span></a>
+                </li>
+        
+        </ul>
+      </form>
+  
+    </div>
+  </nav>
+<h1 >ddddddddddddddddddddd</h1>
+<!-- Modal HTML Markup -->
+<div id="ModalExample" class="modal fade"  data-backdrop='static' data-keyboard='false'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title ">Enter your details</h4>
+            </div>
+            <div class="modal-body">
+                <form id="start_form">
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                      </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Email address</label>
+                      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Contact No</label>
+                        <input type="text" class="form-control" id="contact" placeholder="Contact No">
+                      </div>
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Password</label>
+                      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    </div>
+                
+                  
+                      
+                   <br>
+                    <button id="takedet"  class="btn btn-primary float-right"  >Submit</button>
+                    <button type="reset" class="btn btn-secondary" >Reset</button>
+                  </form>
+            </div>
+            <div  class="modal-footer float-left" >
+              <span id="formmsg" style="position: relative;right:20%">
+                           </span></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </body>
+<script>
+  function startquiz(e){
+    let flag=false;
+    e.preventDefault()
+    var theform = document.getElementById('start_form');
+    let formarr = theform.getElementsByTagName('input');
+    for(i=0;i<formarr.length;i++){
+      console.log(formarr[i].value == "")
+      if(formarr[i].value==""){
+        $("#formmsg").html(`<div class="alert alert-warning" role="alert">
+  Please fill out all the fields!
+</div>`)
+        flag=true;
+        break;
+      }
+    }
+    if(!flag){
+     
+      $.post('/v1/quizzee',{username:formarr[0].value,email:formarr[1].value,contact:formarr[2].value},(data) => {
+        if(data){
+          $("#ModalExample").modal('toggle');
+          $("#username").html(formarr[1].value)
+        }
+
+      })
+
+    }
+    
+    
+
+  }
+ $(document).ready(function(){
+   
+   $("#ModalExample").modal('toggle');
+   let but = document.getElementById('takedet');
+   $("#takedet").on('click',(e) => {
+     startquiz(e);
+   })
+ })
+</script>
 </html>

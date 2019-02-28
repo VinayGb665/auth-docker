@@ -1,6 +1,7 @@
 // -- Globals used for DOM sldiing
 var slideIndex = 1;
 var progResponse ={};
+var slides;
 // ------------------------------------------------
 
 // -- Utility functions to render the quiz(html) after fetching data from the endpoint
@@ -44,7 +45,7 @@ function build_question_html(question){
         <div class="card border-dark mb-3" >
           <div class="card-body">`+question[1]+`
           </div>
-          <input id="`+question[0]+`" type="text" value="" style="display:none"/>
+          <input id="`+question[0]+`"  value="" style="display:none"/>
         </div>
       </div>
       </br>`;
@@ -60,7 +61,8 @@ function build_question_html(question){
 // -- Sliding DOM functions
 function plusSlides(n) {
   showSlides(slideIndex += n);
-  $("#textarea").val("")
+  $("#alert").html("")
+  
 }
 
 function currentSlide(n) {
@@ -69,7 +71,7 @@ function currentSlide(n) {
 
 function showSlides(n) {
   var i;
-  var slides = document.getElementsByClassName("mySlides");
+  slides = document.getElementsByClassName("mySlides");
   
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) {slideIndex = 1}    
@@ -79,6 +81,7 @@ function showSlides(n) {
   }
   
   if(slides[slideIndex-1].getAttribute('type')==2){
+    
     $("#editor").css('display','block');
   }
   else{
@@ -96,30 +99,32 @@ function endquiz(){
   let qcards = $(".mySlides");
   let Allrespjson=[]
   for(i=0;i<qcards.length;i++){
-    let respjson={}
-    let temp_root = qcards[i].firstElementChild;
-    respjson.question=temp_root.firstElementChild.innerHTML.trim();
-    let options = temp_root.getElementsByClassName('radioBtn');
-    console.log(options.length)
-    let flag = false;
-    for(j=0;j<options.length;j++){
-      respjson.qid = options[j].name;
-      if(options[j].checked){
-        respjson.answer = options[j].value;
-        
-        //console.log("COooo")
-        flag=true;
-       
+
+    if(qcards[i].getAttribute('type')!=2){ // if the question is of mcq type (not programming) build it now because we already have prog question responses 
+
+      let respjson={}
+      let temp_root = qcards[i].firstElementChild;
+      let options = temp_root.getElementsByClassName('radioBtn');
+      respjson.question=temp_root.firstElementChild.innerHTML.trim();
+
+      for(j=0;j<options.length;j++){
+
+        respjson.qid = options[j].name;
+
+        if(options[j].checked){
+
+          respjson.answer = options[j].value;
+          
+        }
+
       }
+      
+      //console.log(respjson)
+      Allrespjson.push(respjson)
     }
-    if(!flag){
-      console.log("Prog question")
-    }
-    //console.log(respjson)
-    Allrespjson.push(respjson)
   }
-  console.log(Allrespjson)
-  console.log('aaa',source_codes)
+  console.log(Allrespjson.concat(source_codes))
+  
   //window.open('/','_parent',''); 
   
 }
@@ -149,8 +154,9 @@ function startquiz(e){
    
     $.post('/v1/quizzee',{username:formarr[0].value,email:formarr[1].value,contact:formarr[2].value},(data) => {
       if(data){
+        console.log("WTF ",$("#user"))
         $("#ModalExample").modal('toggle'); 
-        $("#username").html(formarr[1].value) // Setting username within the UI
+        $("#user").html(formarr[1].value) // Setting username within the UI
         $('#timer').countdown('resume')
       }
     })
@@ -193,9 +199,9 @@ $(document).ready(function(){
       span_str +=`<span class="dot" onclick="currentSlide(`+i+`)"></span>`;
     }
     
-    date.setHours(date.getHours()+Number(hours))
-    date.setMinutes(date.getMinutes()+Number(mins))
-    //date.setSeconds(date.getSeconds()+15)
+    //date.setHours(date.getHours()+Number(hours))
+    //date.setMinutes(date.getMinutes()+Number(mins))
+    date.setSeconds(date.getSeconds()+15)
     
     
     $('#timer').countdown(date, function(event) {

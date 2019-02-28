@@ -37,7 +37,8 @@ function showErr(msg,type,version){
         <div class="alert alert-success" role="alert"><strong>STDOUT : &nbsp;&nbsp;&nbsp;</strong>`+msg['stdout']+`</div>`
         )
 
-    }   
+    }
+    fill_cache_code();  
 }
 
 function fill_cache_code(){
@@ -100,11 +101,19 @@ $(document).ready(function(){
              "source_code":$("#textarea").val(),
              "lang":{"id":$('#drops option:selected').val()}
          }
-         source_codes.push($("#textarea").val())
+         /**
+          * Storing the response for the code which will be run here since the editor is just a hide/show widget we need to clear it
+          */
+         let code_resp={}
+        
+         code_resp.question = slides[slideIndex-1].textContent.trim()
+         code_resp.qid = slides[slideIndex-1].getElementsByTagName('input')[0].id;
+         code_resp.source_code = $("#textarea").val();
+         
          let version=$('#version option:selected').val()
          console.log("version",version)
          if(version==2){
-             piler_url="/v2/piler"
+             piler_url="/v2/piler" 
          }
          else{
             piler_url="/v1/piler"
@@ -113,9 +122,14 @@ $(document).ready(function(){
 
          $.post(piler_url,data,(resp) =>{
              
-            console.log(resp)
-             respo =(JSON.parse(resp))
+            
+            respo =(JSON.parse(resp))
+          
             if(respo.hasOwnProperty('description')){
+
+                code_resp.token=respo.token;
+                source_codes.push(code_resp)
+
                 if(respo['description']=="Accepted"){
                     showErr(respo,1,1); // No compilation or runtime errors and 
                 }
