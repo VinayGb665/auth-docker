@@ -38,7 +38,10 @@ function showErr(msg,type,version){
         )
 
     }
-    fill_cache_code();  
+    if(typeof(slides)!= 'undefined'){
+        fill_cache_code();  
+    }
+    
 }
 
 function fill_cache_code(){
@@ -72,7 +75,7 @@ $(document).ready(function(){
     //Onload fetch all the languages to fill in the select dropdowmm
     $.get(piler_langs_url,(data) =>{ 
         if(data){
-            let html_str = '<select  class="form-control" id="drops">';
+            let html_str = '</br><select  class="form-control" id="drops" style="width: 70%">';
                 
             data.forEach(element => {
                 html_str+=`<option value=`+element['id']+`>`+element['name']+`</option>`
@@ -80,15 +83,21 @@ $(document).ready(function(){
             html_str+='</select>'
             $("#selector").html(html_str);
 
-            fill_cache_code()
+            
             
         } 
         else options =[]
     }).then(() => {
-        $("#drops").on('change',(e) => {
+        
+        if(typeof(token)==='undefined'){
+            $("#drops").on('change',(e) => {
+                fill_cache_code()
+            })
             fill_cache_code()
-        })
-
+        }
+        else{
+            $("#drops").attr('disabled','true');
+        }
     })
 
 
@@ -105,9 +114,11 @@ $(document).ready(function(){
           * Storing the response for the code which will be run here since the editor is just a hide/show widget we need to clear it
           */
          let code_resp={}
-        
-         code_resp.question = slides[slideIndex-1].textContent.trim()
-         code_resp.qid = slides[slideIndex-1].getElementsByTagName('input')[0].id;
+         if(typeof(slides)!= 'undefined'){
+            code_resp.question = slides[slideIndex-1].textContent.trim() || '';
+            code_resp.qid = slides[slideIndex-1].getElementsByTagName('input')[0].id || '';
+         
+         }
          code_resp.source_code = $("#textarea").val();
          
          let version=$('#version option:selected').val()
@@ -127,7 +138,8 @@ $(document).ready(function(){
           
             if(respo.hasOwnProperty('description')){
 
-                code_resp.token=respo.token;
+                code_resp.token='/quiz/55654654/'+respo.token;
+                code_resp.type=2
                 source_codes.push(code_resp)
 
                 if(respo['description']=="Accepted"){

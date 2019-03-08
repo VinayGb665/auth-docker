@@ -1,46 +1,64 @@
+
 <!-- views/partials/header.ejs -->
+<div class="wrapper">
+  <!-- Sidebar Holder -->
+  <nav id="sidebar">
+      <div class="sidebar-header">
+          <h3 ><a href="/">Coderden</a></h3></h3>
+      </div>
 
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/editor">Editor</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item ">
-          <a class="nav-link" href="/choseq">Chose questions<span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#">Quiz<span class="sr-only">(current)</span></a>
-        </li>
-        
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Dropdown
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Something else here</a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
-        
+      <ul class="list-unstyled components">
+          <p id="user">Hi Guest</p>
+          <li class="nav-item ">
+          <a class="navbar-brand" href="/editor">Editor</a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="/choseq">Chose questions<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="#">Quiz<span class="sr-only">(current)</span></a>
+          </li>
+          
+          
+          
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-          <ul class="navbar-nav mr-auto">
-              <i class="fa fa-user" aria-hidden="true"></i>
-              <li class="nav-item ">
-                  <span  class="nav-link" id="user">Guest</span><span class="sr-only">(current)</span></a>
-                </li>
-        
-        </ul>
-      </form>
-  
-    </div>
+
+      
   </nav>
+
+  <!-- Page Content Holder -->
+
+
+      
+
+  
+  </div>
+</div>
+
+
+
+
+
+
+  <script>
+   flag=1
+   $('#sidebar, #content').attr('class','');
+        $("body").on("mousemove",function(event) {
+          
+          let cent = event.clientX/$(document ).width() *100;
+     // console.log(cent)
+    if (cent < 35 ) {
+        // do something
+       // console.log("aa")
+       $('#sidebar, #content').attr('class','');
+       
+            flag=1
+    }
+    else{
+      $('#sidebar, #content').attr('class','active');
+      
+    
+      flag=0;
+    }
+});
+  </script>

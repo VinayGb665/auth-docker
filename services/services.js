@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const logger = require('./logger')
 var csv = require("fast-csv");
 var models = require('../models/models');
 const cache_code =require('../cache_code')
@@ -53,8 +54,11 @@ var services = {
                     req.body.content = `<html><body><p>We recieved a password reset request for this account .Please <a href="http://localhost:3000/reset/`+resetHash+`">Click Here </a> to reset </p></body></html>`;
 
                     services.sendmail(req,res, (err, info ) =>{
-                        console.log(err);
-                        if(err) res.send({'status':'There was an error sending out the email','err':err})
+                        
+                        if(err) {
+                            logger.log('info',"Error in reset_pass",err)
+                            res.send({'status':'There was an error sending out the email','err':err});
+                        }
                         else{
                             res.send({'status':'Success.Reset link has been sent to the users email'});
                         }
@@ -62,11 +66,13 @@ var services = {
                    
                 }
                 else{
+                    logger.log('info',"Cannot send password reset link. No email found for the user .")
                     res.send({'status':'Cannot send password reset link. No email found for the user .'});
                 }
 
             }
             else{
+                
                 res.send({'status':'Error. No such username found'})
             }
 
@@ -132,10 +138,8 @@ var services = {
     },
     renderquiz : (req,res) =>{
         let hash = req.params.hash;
-        console.log(hash)
+        logger.log('info',"Rendering quiz with hash :"+hash)
         quizModel.findOne({link:hash},{_id:0},(err,results) =>{
-
-            console.log(err,results)
 
             if(!err && results){
                 results=JSON.parse(JSON.stringify(results))
@@ -148,25 +152,26 @@ var services = {
                 .fromPath("resources/"+topic)
                 .on("data", function(data){
                     for(i=0;i<qids.length;i++){
-                        //console.log(qids[i])
-                        if(qids[i]==data[0]){
-                            //console.log('uh huh',i)
+                        
+                        if(qids[i]==data[0]){    
                             qarr.push(data)
                         }
 
                     }
                 })
                 .on("end", function(){
-                     console.log(qarr)
-                     res.send({qarr:qarr,hours:results.hours,mins:results.mins})
+                    logger.log('info',"Successfully built questions array and sent")
+                    res.send({qarr:qarr,hours:results.hours,mins:results.mins,topic:topic})
                 })
                 
             }
             else{
                 if(!results){
+                    logger.log('error',"No quiz found for the supplied hash. Please verify")
                     res.send("OK SMD NO QUIZ FOR U")
                 }
                 else{
+                    logger.log('error',"Error rendering quiz :",hash,err)
                     res.send(err)
                 }
             }
@@ -198,8 +203,10 @@ var services = {
                     if(err) res.send(JSON.stringify({"err":err,"stderr":stderr}))
                     else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}))
                     fs.unlink("prog.py",(err) => {
-                        if(!err) console.log("deleted")
-                        else console.log("error while executing")
+                        if(!err) logger.log('info',"deleted file")
+                        else{
+                            logger.log('error',"Error while executing(deleting the file)");
+                        } 
                     });
                 })
             })
@@ -213,7 +220,9 @@ var services = {
                     else res.send(JSON.stringify({"stdout":stdout,"stderr":stderr}));
                     fs.unlink("prog.js",(err) => {
                         if(!err) console.log("deleted")
-                        else console.log("error while executing")
+                        else{
+                            logger.log('error',"Error while executing(deleting the file)");
+                        } 
                     });
                 })
             })
@@ -262,6 +271,44 @@ var services = {
                 console.log("\r\nError saving new quiz candidate",err)
                 res.send(err);
             }
+        })
+    },
+    crunchresults: (req,res) => {
+        let topic = req.body.topic;
+        let qids = req.body.qarr;
+        let report =
+                    {
+                        'unanswered':0,
+                        'correct_answers':0,
+                        'incorrect_answers':0
+
+                    }
+        let qarr = []
+        csv
+        .fromPath("resources/"+topic)
+        .on("data", function(data){
+            for(i=0;i<qids.length;i++){
+                console.log(qids[i])
+                if(qids[i].qid==data[0]){
+                    //console.log('uh huh',i)
+                    qarr.push(data[4])
+                    if(qids[i].answer=='0000'){
+                        report.unanswered+=1
+                    }
+                    else if(qids[i].type!=2 && qids[i].answer == data[4]){
+                        report.correct_answers+=1
+                    }
+                    
+                    else if(qids[i].type!=2 && qids[i].answer != data[4]){
+                        report.incorrect_answers+=1
+                    }
+                }
+
+            }
+        })
+        .on("end", function(){
+            console.log(qarr)
+            res.send(report)
         })
     }
 

@@ -17,8 +17,10 @@
     "express": "^4.16.4",
     "fast-csv": "^2.4.1",
     "mongoose": "^5.4.6",
+    "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",
     "request": "^2.88.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1"
   }
 }

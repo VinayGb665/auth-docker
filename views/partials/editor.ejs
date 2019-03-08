@@ -2,9 +2,17 @@
 <div class="editor-left" >
     <form id="editor">
         
-    <textarea class="form-control" autocorrect="false" spellcheck="false" id="textarea" rows="8" ></textarea>
+            <div id="edit_q" class="card border-dark mb-3" style="display:none" >
+              <div class="card-body">Question here
+              </div>
+
+            </div>
+          
+          </br>
+
+    <textarea class="form-control" autocorrect="false" spellcheck="false" id="textarea" rows="8" style="width: 80%"></textarea>
     <div id="selector"></div> <br>
-    <div id="version" class="form-group">
+    <div id="version" class="form-group" style="display:none">
             <label for="sel1">Select Version:</label>
             <select class="form-control" id="sel1">
               <option>1</option>
@@ -12,7 +20,7 @@
             </select>
           </div></br>
     <div>
-     <center> <button type="submit" class="btn btn-primary btn-outline-danger btn-lg"  >&nbsp;&nbsp;&nbsp;RUN&nbsp;&nbsp;&nbsp;</button></center><br>
+     <center> <button type="submit" id="pilerbut" class="btn btn-primary btn-outline-danger btn-lg"  >&nbsp;&nbsp;&nbsp;RUN&nbsp;&nbsp;&nbsp;</button></center><br>
     </div>
     
     <div id="alert"></div>
