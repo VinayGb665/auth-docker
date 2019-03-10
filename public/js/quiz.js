@@ -1,7 +1,7 @@
 // -- Globals used for DOM sldiing
 var slideIndex = 1;
 var progResponse ={};
-var slides;
+var slides,topic;
 // ------------------------------------------------
 
 // -- Utility functions to render the quiz(html) after fetching data from the endpoint
@@ -15,7 +15,7 @@ function build_question_html(question){
     if(question[2]==1){
         html_str+=`
       
-        <div class="mySlides">  
+        <div class="mySlides" type="1">  
           <div class="card" >
             <div class="card-header">
                 `+question[1]+`
@@ -38,6 +38,32 @@ function build_question_html(question){
         })
         html_str+='</div></div></div></br>'
     }
+    else if(question[2]==3){
+      html_str+=`
+    
+      <div class="mySlides" type="3">  
+        <div class="card" >
+          <div class="card-header">
+              `+question[1]+`
+          </div>
+          <div class="card-body">
+      `;
+      question[3].split(";").forEach((option)=>{
+          html_str+=`
+          
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <input class="radioBtn" type="checkbox" name="`+question[0]+`" aria-label="Checkbox for following text input" value="`+option+`" >
+              </div>
+            </div>
+          <input type="text" class="form-control" readonly aria-label="Text input with checkbox" value="`+option+`">
+          </div>
+          
+        `
+      })
+      html_str+='</div></div></div></br>'
+  }
     else{
 
       html_str=`
@@ -99,32 +125,64 @@ function endquiz(){
   let qcards = $(".mySlides");
   let Allrespjson=[]
   for(i=0;i<qcards.length;i++){
-
-    if(qcards[i].getAttribute('type')!=2){ // if the question is of mcq type (not programming) build it now because we already have prog question responses 
-
+    console.log(qcards[i].getAttribute('type'))
+    if(qcards[i].getAttribute('type')==1){ // if the question is of mcq type (not programming) build it now because we already have prog question responses 
+      
       let respjson={}
       let temp_root = qcards[i].firstElementChild;
       let options = temp_root.getElementsByClassName('radioBtn');
       respjson.question=temp_root.firstElementChild.innerHTML.trim();
-
+      respjson.answer =''
+      respjson.type = '1'
       for(j=0;j<options.length;j++){
 
         respjson.qid = options[j].name;
 
         if(options[j].checked){
 
-          respjson.answer = options[j].value;
+          respjson.answer += '1';
           
+        }
+        else{
+          respjson.answer += '0'
         }
 
       }
       
-      //console.log(respjson)
+      console.log(respjson)
+
+      Allrespjson.push(respjson)
+    }
+    else if(qcards[i].getAttribute('type')==3){
+      let respjson={}
+      let temp_root = qcards[i].firstElementChild;
+      let options = temp_root.getElementsByClassName('radioBtn');
+      respjson.question=temp_root.firstElementChild.innerHTML.trim();
+      respjson.answer ='';
+      respjson.type = '3';
+      for(j=0;j<options.length;j++){
+
+        respjson.qid = options[j].name;
+
+        if(options[j].checked){
+
+          respjson.answer += '1';
+          
+        }
+        else{
+          respjson.answer += '0'
+        }
+
+      }
       Allrespjson.push(respjson)
     }
   }
   console.log(Allrespjson.concat(source_codes))
+  console.log("Topic:",topic)
   
+  $.post('/v1/results',{topic:topic,qarr:Allrespjson},(data)=>{
+    console.log(data);
+  })
   //window.open('/','_parent',''); 
   
 }
@@ -156,7 +214,7 @@ function startquiz(e){
       if(data){
         console.log("WTF ",$("#user"))
         $("#ModalExample").modal('toggle'); 
-        $("#user").html(formarr[1].value) // Setting username within the UI
+        $("#user").html("Hi, "+ formarr[1].value) // Setting username within the UI
         $('#timer').countdown('resume')
       }
     })
@@ -185,35 +243,40 @@ $(document).ready(function(){
   })
   $.post('/v1/quiz/'+hash,(data) => {
   
-    console.log(data);
-    
-    let hours = data.hours;
-    let mins = data.mins;
-    data = data.qarr;
-    var html_str = '';
-    var span_str = '';
-    var date = new Date();
-    
-    for(i=0;i<data.length;i++){
-      html_str +=build_question_html(data[i])
-      span_str +=`<span class="dot" onclick="currentSlide(`+i+`)"></span>`;
+    if(typeof(data)!=='undefined'){
+      console.log(data);
+      
+      let hours = data.hours;
+      let mins = data.mins;
+      topic = data.topic;
+      data = data.qarr;
+      var html_str = '';
+      var span_str = '';
+      var date = new Date();
+      if(typeof(data)!=='undefined'){
+        for(i=0;i<data.length;i++){
+          html_str +=build_question_html(data[i])
+          span_str +=`<span class="dot" onclick="currentSlide(`+i+`)"></span>`;
+        }
+        
+        //date.setHours(date.getHours()+Number(hours))
+        //date.setMinutes(date.getMinutes()+Number(mins))
+        date.setSeconds(date.getSeconds()+10)
+        
+        
+        $('#timer').countdown(date, function(event) {
+          $(this).html(event.strftime('%M:%S'));
+        })
+        $('#timer').countdown('pause')
+        .on('finish.countdown', function() {
+          $("#exampleModal").modal('toggle'); 
+        })
+      
+        $("#qbox").html(html_str);
+          showSlides(slideIndex);
+      }
     }
     
-    //date.setHours(date.getHours()+Number(hours))
-    //date.setMinutes(date.getMinutes()+Number(mins))
-    date.setSeconds(date.getSeconds()+15)
-    
-    
-    $('#timer').countdown(date, function(event) {
-      $(this).html(event.strftime('%H:%M:%S'));
-    })
-    $('#timer').countdown('pause')
-    .on('finish.countdown', function() {
-      $("#exampleModal").modal('toggle'); 
-    })
-   
-    $("#qbox").html(html_str);
-      showSlides(slideIndex);
     })
     
 

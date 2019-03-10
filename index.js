@@ -9,7 +9,7 @@
 
 // Packages and dependancies -- >
 require('dotenv').config()
-
+var morgan = require('morgan')
 var express =require('express')
 var app =express()
 var models = require('./models/models')
@@ -22,6 +22,7 @@ let userModel = models.userSchema
 var services = require('./services/services');
 var auth_services = require('./services/auth_services');
 var request = require('request')
+var logger = require('./services/logger')
 const fs = require('fs')
 const path = require('path');
 const exec = require('child_process').exec;
@@ -32,7 +33,8 @@ app.set('view engine', 'ejs');
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
-
+//logger.debug("Overriding 'Express' logger");
+//app.use(require('morgan')({ "stream": logger.stream }));
 // Routes  -- >
 app.get('/',(req,res) =>{
     //res.sendFile(__dirname+"/views/idk.html")
@@ -104,8 +106,15 @@ app.get('/v1/gettopics',(req,res) =>{
     services.gettopics(req,res);
 })
 
-app.get('/v1/quiz/:hash',(req,res) =>{
-    res.render('pages/quiz');
+app.get('/v1/quiz/:hash/:token?',(req,res) =>{
+    console.log(req.params)
+    if(req.params.token!=null){
+        res.render('pages/code')
+    }
+    else{
+        res.render('pages/quiz');
+    }
+    
 })
 
 app.post('/v1/quiz/:hash',(req,res) =>{
@@ -284,10 +293,18 @@ app.get('/v1/cache_code/:language',(req,res) => {
 
 })
 
+app.post('/v1/results',(req,res) =>{
+    services.crunchresults(req,res);
+})
 
 app.post('/v1/quizzee', (req,res) =>{
     services.getquizzee(req,res);
 })
+
+app.get('/404',(req,res)=>{
+    res.render('pages/404')
+})
+
 app.listen(http_port, (err) => {
     console.log(http_port)
     console.assert(!err,'Error');
