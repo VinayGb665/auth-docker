@@ -4,4 +4,4 @@ ID,QUESTION,TYPE_ID,OPTIONS
 3,how is A,1,a;b;c;d
 4,Why is A,2,a;b;c;d
 5,When is A,1,a;b;c;d
-6,which is A,2
+6,which is A,2,
